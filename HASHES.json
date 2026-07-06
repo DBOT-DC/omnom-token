@@ -1,10 +1,8 @@
 {
-  "/Users/penny/Documents/DBOT-Vault-Final/03-Research/Dogechain/omnom-snapshot/": {
-    "omnom-snapshot-FINAL.json": "16d6cb810b62082d9b5e5ed981c7165ab045c19b224c48c3973cfce6efba8e17",
-    "omnom-snapshot-pre-announcement.csv": "056433ed5f60fbd3ce0fa6399fb3035422ce1eaa0da3fffc7f019ea477968811"
-  },
-  "/tmp/omnom-snapshot/": {
-    "omnom-snapshot-FINAL.json": "16d6cb810b62082d9b5e5ed981c7165ab045c19b224c48c3973cfce6efba8e17",
-    "omnom-snapshot-pre-announcement.csv": "056433ed5f60fbd3ce0fa6399fb3035422ce1eaa0da3fffc7f019ea477968811"
-  }
+  "weekly-2026-06-28.json": "5c91207676340339bd816aeb74a916f41d0306a9b4a201b97a0a6237653ef8e7",
+  "weekly-2026-06-28.csv": "d847f7559aa35a459c2d551e0dc42ba43a4172b32aa972e018f524f9b4b1c30e",
+  "weekly-2026-07-05.json": "782395fb0e5521635012245edc9c9236aa8f7a398e153ab1c5de3028a2f874e9",
+  "weekly-2026-07-05.csv": "662bd0cf244a75303e2da97edc05b9d6edea938d0963fc14d43ea4460fa6ab6d",
+  "omnom-snapshot-FINAL.json": "16d6cb810b62082d9b5e5ed981c7165ab045c19b224c48c3973cfce6efba8e17",
+  "omnom-snapshot-pre-announcement.csv": "056433ed5f60fbd3ce0fa6399fb3035422ce1eaa0da3fffc7f019ea477968811"
 }

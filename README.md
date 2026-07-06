@@ -51,19 +51,19 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 | Baseline | Jun 7 | 59,922,100 | 25,431 | — | BlockScout API |
 | Week 1 | Jun 14 | 60,224,436 | 25,344 | -87 | Backfill (transfer events) |
 | Week 2 | Jun 21 | 60,526,824 | 25,388 | -43 | Backfill (transfer events) |
-| Week 3 | Jun 28 | 60,825,305 | 25,442 | +11 | Live cron (top 100 only) |
+| Week 3 | Jun 28 | 60,829,218 | 25,442 | +11 | Backfill (transfer events) |
 | Week 4 | Jul 5 | 61,131,617 | 25,474 | +43 | Backfill (transfer events) |
 
 **Files in `weekly/`:**
 - `weekly-2026-06-14.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 - `weekly-2026-06-21.json` + `.csv` — Full holder list (backfilled, 6 MB each)
-- `weekly-2026-06-28.json` — Top 100 holders only (live cron snapshot, 12 KB)
+- `weekly-2026-06-28.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 - `weekly-2026-07-05.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 
 #### Methods
 
 1. **Backfill** (`backfill_snapshot.py`): Forward-applies Transfer events from baseline block to target block using `eth_getLogs`. Produces full accurate holder lists. Used for Weeks 1–2.
-2. **Live cron** (`weekly_snapshot.py`): Fetches current holders from BlockScout API at execution time. Only saves top 100 to keep file sizes manageable. Used from Week 3 onward.
+2. **Live cron** (`weekly_snapshot.py`): Fetches current holders from BlockScout API at execution time. Originally captured top 100 only; Week 3 later backfilled with full data. Used as fallback when RPC backfill is not available.
 
 #### Why Week 3 is smaller
 
