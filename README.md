@@ -1,8 +1,8 @@
 # OMNOM Token Holder Snapshots
 
-Historical holder snapshots for the **OMNOM** ERC-20 token on **Dogechain** (now shut down).
+Historical holder snapshots for the **OMNOM** ERC-20 token on **Dogechain**.
 
-> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. These snapshots preserve the on-chain state before the chain went offline.
+> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. Snapshots are collected weekly until the chain goes offline.
 
 ---
 
@@ -62,12 +62,8 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 
 #### Methods
 
-1. **Backfill** (`backfill_snapshot.py`): Forward-applies Transfer events from baseline block to target block using `eth_getLogs`. Produces full accurate holder lists. Used for Weeks 1–2.
-2. **Live cron** (`weekly_snapshot.py`): Fetches current holders from BlockScout API at execution time. Originally captured top 100 only; Week 3 later backfilled with full data. Used as fallback when RPC backfill is not available.
-
-#### Why Week 3 is smaller
-
-The weekly cron script (`weekly_snapshot.py`) only captures the top 100 holders + distribution metadata. The backfill script captures ALL holders but requires RPC access to replay transfer events. After Week 3, the cron continued running until the final snapshot date (Aug 3) — if additional weekly files exist post-shutdown they were not recovered.
+1. **Backfill** (`backfill_snapshot.py`): Forward-applies Transfer events from baseline block (59,922,100) to target block using `eth_getLogs` via RPC. Binary-searches for the exact block at the target timestamp. Produces full accurate holder lists with zero negative balances. Used for all weekly snapshots to date.
+2. **Live cron** (`weekly_snapshot.py`): Fetches current holders from BlockScout API at execution time. Originally captured top 100 only; those snapshots were later replaced with full backfills. Serves as a fallback when RPC backfill is not available.
 
 ---
 
@@ -114,8 +110,7 @@ The OMNOM wallet lookup bot runs on `@DBOT_DC_BOT` (Hermes agent). Send any wall
 ## Data Integrity
 
 - `HASHES.json` contains SHA-256 hashes for the primary snapshot files
-- Backfill reconciliation: Weeks 1–2 both achieved 99.99999% balance reconciliation (forward-applied transfers match expected supply)
-- Zero negative balances in all snapshots
+- Backfill reconciliation: All weekly snapshots achieve >99.99% balance reconciliation (forward-applied transfers match expected supply). Zero negative balances in all snapshots.
 
 ---
 
@@ -123,9 +118,9 @@ The OMNOM wallet lookup bot runs on `@DBOT_DC_BOT` (Hermes agent). Send any wall
 
 - **Announced:** June 8, 2026 by @DogechainFamily
 - **Window:** ~60 days → estimated shutdown ~August 7, 2026
-- **RPC status at last check:** `rpc.dogechain.dog` dead, `rpc01-sg.dogechain.dog` dead, `rpc.thirdweb.com/dogechain` alive (but chain may be frozen post-shutdown)
-- **BlockScout Explorer:** `explorer.dogechain.dog` — API partially functional (account/txlist works, stats/tokenlist broken)
-- **Final snapshot:** August 3, 2026 (Sunday before estimated shutdown)
+- **RPC status at last check (Jul 6, 2026):** `rpc.dogechain.dog` alive, `dogechain.rpc.thirdweb.com` alive, `rpc01-sg.dogechain.dog` returning 308 redirects. Chain progressing normally at ~61.1M blocks.
+- **BlockScout Explorer:** `explorer.dogechain.dog` — API partially functional (account/txlist works, token/getTokenHolders works, stats/tokenlist/logs mostly broken)
+- **Final snapshot target:** August 3, 2026 (Sunday before estimated shutdown)
 
 ---
 
