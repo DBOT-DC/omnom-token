@@ -52,11 +52,13 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 | Week 1 | Jun 14 | 60,224,436 | 25,344 | -87 | Backfill (transfer events) |
 | Week 2 | Jun 21 | 60,526,824 | 25,388 | -43 | Backfill (transfer events) |
 | Week 3 | Jun 28 | 60,825,305 | 25,442 | +11 | Live cron (top 100 only) |
+| Week 4 | Jul 5 | 61,131,617 | 25,474 | +43 | Backfill (transfer events) |
 
 **Files in `weekly/`:**
 - `weekly-2026-06-14.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 - `weekly-2026-06-21.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 - `weekly-2026-06-28.json` — Top 100 holders only (live cron snapshot, 12 KB)
+- `weekly-2026-07-05.json` + `.csv` — Full holder list (backfilled, 6 MB each)
 
 #### Methods
 
