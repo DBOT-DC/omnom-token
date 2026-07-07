@@ -171,6 +171,62 @@ def main():
             })
     print(f"CSV: {csv_path}")
 
+    # Copy to lookup path for OMNOM wallet bot
+    import shutil
+    LOOKUP_PATH = "/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-latest.csv"
+    shutil.copy2(csv_path, LOOKUP_PATH)
+    print(f"Lookup updated: {LOOKUP_PATH}")
+
+    # Update ever-held master list for airdrop eligibility
+    EVER_HELD_PATH = "/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-ever-held.csv"
+    PRE_PATH = "/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-pre-announcement.csv"
+    
+    all_sources = [PRE_PATH]
+    if os.path.exists(WEEKLY_DIR):
+        for f in sorted(os.listdir(WEEKLY_DIR)):
+            if f.endswith(".csv"):
+                all_sources.append(os.path.join(WEEKLY_DIR, f))
+    
+    ever_holders = {}
+    for src in sorted(all_sources):
+        src_label = os.path.basename(src).replace(".csv", "").replace("omnom-snapshot-", "")
+        try:
+            with open(src, newline="") as sf:
+                for row in csv.DictReader(sf):
+                    addr = row["address"].lower()
+                    bal_raw = int(row["balance_raw"])
+                    if addr not in ever_holders:
+                        ever_holders[addr] = {
+                            "max_balance_raw": bal_raw,
+                            "max_balance_formatted": row["balance_formatted"],
+                            "max_pct": float(row["percentage_of_supply"]),
+                            "best_rank": int(row["rank"]),
+                            "snapshots": [src_label],
+                            "first_seen": src_label,
+                        }
+                    else:
+                        if bal_raw > ever_holders[addr]["max_balance_raw"]:
+                            ever_holders[addr]["max_balance_raw"] = bal_raw
+                            ever_holders[addr]["max_balance_formatted"] = row["balance_formatted"]
+                            ever_holders[addr]["max_pct"] = float(row["percentage_of_supply"])
+                        if int(row["rank"]) < ever_holders[addr]["best_rank"]:
+                            ever_holders[addr]["best_rank"] = int(row["rank"])
+                        if src_label not in ever_holders[addr]["snapshots"]:
+                            ever_holders[addr]["snapshots"].append(src_label)
+        except Exception as e:
+            print(f"  Warning: could not read {src}: {e}")
+    
+    sorted_ever = sorted(ever_holders.items(), key=lambda x: x[1]["max_balance_raw"], reverse=True)
+    with open(EVER_HELD_PATH, "w", newline="") as ef:
+        writer = csv.writer(ef)
+        writer.writerow(["rank", "address", "max_balance_raw", "max_balance_formatted",
+                         "max_percentage", "best_rank", "snapshot_count", "snapshots", "first_seen"])
+        for i, (addr, data) in enumerate(sorted_ever):
+            writer.writerow([i + 1, addr, data["max_balance_raw"], data["max_balance_formatted"],
+                             f"{data['max_pct']:.6f}", data["best_rank"], len(data["snapshots"]),
+                             ",".join(data["snapshots"]), data["first_seen"]])
+    print(f"Ever-held updated: {EVER_HELD_PATH} ({len(sorted_ever):,} total unique holders)")
+
     # Baseline comparison
     diff = len(sorted_holders) - BASELINE_HOLDERS
     print(f"\nBaseline comparison (Jun 7, block {BASELINE_BLOCK}):")

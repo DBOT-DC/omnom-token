@@ -1,50 +1,78 @@
 #!/bin/bash
-# OMNOM Wallet Lookup Script
+# OMNOM Wallet Lookup — Ever-Held Mode
+# Default: checks master ever-held list (union of ALL weekly snapshots)
+# Shows max balance ever held + whether they currently still hold
+#
 # Usage: lookup.sh <wallet_address>
-# Returns: rank, balance, percentage, holder class from snapshot
+# Output: STATUS, RANK, BALANCE, PERCENTAGE, CLASS, CURRENTLY_HOLDS
+#
+# Data files (managed by weekly_snapshot.py cron):
+#   omnom-snapshot-ever-held.csv  — tab-delimited, union of all snapshots (default)
+#   omnom-snapshot-latest.csv     — comma-delimited, current holders only (for CURRENTLY_HOLDS check)
 
 WALLET="$1"
-SNAPSHOT_CSV="/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-pre-announcement.csv"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+EVER_HELD_CSV="${SCRIPT_DIR}/omnom-snapshot-ever-held.csv"
+LATEST_CSV="${SCRIPT_DIR}/omnom-snapshot-latest.csv"
+DECIMALS=18
 
-# Validate input
 if [[ ! "$WALLET" =~ ^0x[a-fA-F0-9]{40}$ ]]; then
-    echo "INVALID: Not a valid Ethereum-style address"
+    echo "INVALID"
     exit 1
 fi
 
-# Normalize to lowercase for matching
 WALLET_LOWER=$(echo "$WALLET" | tr '[:upper:]' '[:lower:]')
 
-# Look up in CSV (case-insensitive)
-# CSV format: rank,address,balance_raw,balance_formatted,percentage_of_supply
-RESULT=$(awk -F',' -v addr="$WALLET_LOWER" '
-    NR > 1 && tolower($2) == addr {
-        printf "%s,%s,%s,%s", $1, $2, $4, $5
+# Check ever-held master list (tab-delimited)
+RESULT=$(awk -F'\t' -v addr="$WALLET_LOWER" '
+    NR > 1 && $2 == addr {
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", $1, $2, $3, $4, $5, $6, $7, $8
         exit 0
     }
-' "$SNAPSHOT_CSV")
+' "$EVER_HELD_CSV")
 
-if [ -z "$RESULT" ]; then
-    echo "NOT_FOUND"
+if [ -n "$RESULT" ]; then
+    RANK=$(echo "$RESULT" | cut -f1)
+    BAL_RAW=$(echo "$RESULT" | cut -f3)
+    PCT=$(echo "$RESULT" | cut -f4)
+    BEST_RANK=$(echo "$RESULT" | cut -f5)
+    SNAP_COUNT=$(echo "$RESULT" | cut -f6)
+    SNAPSHOTS=$(echo "$RESULT" | cut -f7)
+    FIRST_SEEN=$(echo "$RESULT" | cut -f8)
+
+    # Format balance
+    BAL_FMT=$(python3 -c "print(f'{float(\"$BAL_RAW\") / 10**$DECIMALS:,.2f}')" 2>/dev/null || echo "$BAL_RAW")
+
+    # Determine class
+    PCT_NUM=$(echo "$PCT" | awk '{printf "%.4f", $1}')
+    if (( $(echo "$PCT_NUM >= 1.0" | bc -l) )); then
+        CLASS="🐋 Whale"
+    elif (( $(echo "$PCT_NUM >= 0.01" | bc -l) )); then
+        CLASS="🐬 Dolphin"
+    else
+        CLASS="🐟 Fish"
+    fi
+
+    # Check if currently holds (in latest snapshot)
+    STILL_HOLDS="no"
+    if [ -f "$LATEST_CSV" ]; then
+        LATEST_CHECK=$(awk -F',' -v addr="$WALLET_LOWER" '
+            NR > 1 && tolower($2) == addr { print "yes"; exit 0 }
+        ' "$LATEST_CSV")
+        [ "$LATEST_CHECK" = "yes" ] && STILL_HOLDS="yes"
+    fi
+
+    echo "STATUS:EVER_HELD"
+    echo "RANK:$RANK"
+    echo "BEST_RANK:$BEST_RANK"
+    echo "BALANCE:$BAL_FMT"
+    echo "PERCENTAGE:$PCT"
+    echo "CLASS:$CLASS"
+    echo "SNAPSHOTS:$SNAP_COUNT ($SNAPSHOTS)"
+    echo "FIRST_SEEN:$FIRST_SEEN"
+    echo "CURRENTLY_HOLDS:$STILL_HOLDS"
     exit 0
 fi
 
-# Parse fields
-RANK=$(echo "$RESULT" | cut -d',' -f1)
-BALANCE=$(echo "$RESULT" | cut -d',' -f3)
-PCT=$(echo "$RESULT" | cut -d',' -f4)
-
-# Determine holder class
-PCT_NUM=$(echo "$PCT" | awk '{printf "%.4f", $1}')
-if (( $(echo "$PCT_NUM >= 1.0" | bc -l) )); then
-    CLASS="🐋 Whale"
-elif (( $(echo "$PCT_NUM >= 0.01" | bc -l) )); then
-    CLASS="🐬 Dolphin"  
-else
-    CLASS="🐟 Fish"
-fi
-
-echo "RANK:$RANK"
-echo "BALANCE:$BALANCE"
-echo "PERCENTAGE:$PCT"
-echo "CLASS:$CLASS"
+echo "NOT_FOUND"
+exit 0
