@@ -2,7 +2,7 @@
 
 Historical holder snapshots for the **OMNOM** ERC-20 token on **Dogechain**.
 
-> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. Snapshots are collected weekly until the chain goes offline.
+> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. Snapshots collected weekly until chain shutdown. Data is now archived.
 
 ---
 
@@ -41,13 +41,13 @@ The **union of all snapshots** — anyone who held OMNOM at any point during the
 
 ### Current Holders (Latest)
 
-The most recent weekly snapshot — holders with non-zero OMNOM balance right now.
+The most recent weekly snapshot — holders with non-zero OMNOM balance at the last collection.
 
 | Field | Value |
 |-------|-------|
 | File | `omnom-snapshot-latest.csv` |
 | Format | CSV (comma-delimited) |
-| Holders | 25,474 (as of Jul 5, 2026) |
+| Holders | 25,497 |
 | Columns | `rank`, `address`, `balance_raw`, `balance_formatted`, `percentage_of_supply` |
 
 Used by the lookup script to determine `CURRENTLY_HOLDS: yes/no`.
@@ -86,7 +86,7 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 
 **Files in `weekly/`:** JSON + CSV pairs for each week.
 
-### Ever-Held Data Flow
+### Data Flow
 
 ```
 pre-announcement.csv ──┐
@@ -98,19 +98,14 @@ weekly/w4.csv ──────────┘                      ├──�
                                                └──▶ lookup.sh (ever-held mode)
 ```
 
-Each weekly cron run:
-1. Fetches fresh holders from BlockScout → saves `weekly/YYYY-MM-DD.csv`
-2. Copies to `omnom-snapshot-latest.csv` (for CURRENTLY_HOLDS check)
-3. Merges ALL snapshots → regenerates `omnom-snapshot-ever-held.csv` (for lookup + airdrop)
-
 ---
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `lookup.sh` | Wallet lookup for Telegram bot — ever-held mode. Returns balance, rank, class, snapshot history, currently holds status |
-| `weekly_snapshot.py` | Live weekly snapshot for cron. Fetches current holders from BlockScout API. Updates `latest.csv` + merges into `ever-held.csv`. Built-in end-date guard (stops after Aug 3, 2026) |
+| `lookup.sh` | Wallet lookup for Telegram bot — ever-held mode. Returns rank, balance, class, currently holds status |
+| `weekly_snapshot.py` | Live weekly snapshot for cron. Fetches current holders from BlockScout API. Updates `latest.csv` + merges into `ever-held.csv`. Built-in end-date guard |
 | `backfill_snapshot.py` | Reconstructs historical holder snapshots by replaying Transfer events from baseline block. Binary search for exact block at target timestamp |
 
 ### Lookup Usage
@@ -130,22 +125,26 @@ Each weekly cron run:
 - `FIRST_SEEN` — first snapshot the address appeared in
 - `CURRENTLY_HOLDS` — `yes` if in latest snapshot, `no` if sold
 
-### Cron Schedule
-
-- **Schedule:** `58 23 * * 0` (every Sunday 23:59:58 UTC)
-- **End date:** August 3, 2026 (final snapshot before estimated shutdown)
-- After end date, script exits with "END DATE REACHED" message
-
 ---
 
 ## Telegram Bot
 
-The OMNOM wallet lookup bot runs on `@DBOT_DC_BOT` (Hermes agent). Send any wallet address (0x-prefixed, 42 hex chars) in DM or the OMNOM Telegram channel.
+The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet address (0x-prefixed, 42 hex chars) in DM or the OMNOM Telegram channel.
 
 **Lookup mode:** Ever-held (default). Shows:
-- 🐕 **Ever-held wallet (still holds):** Current balance, rank, class, snapshot history
+- 🐕 **Ever-held wallet (still holds):** Balance, rank, class, snapshot history, currently holds ✅
 - 📤 **Ever-held wallet (sold):** Peak balance, when they held, `CURRENTLY_HOLDS: no`
 - ❌ **Not found:** Never appeared in any on-chain snapshot
+
+**Response format (Telegram):**
+```
+🐕 $OMNOM Snapshot Lookup
+💰 Balance: 437,380,938,699.93 OMNOM
+📊 Supply: 0.044%
+🏷️ Rank: #94 of 25,591
+🐬 Dolphin
+📅 Snapshot: June 7, 2026 23:59:58 UTC (Block 59,922,100)
+```
 
 ---
 
@@ -161,9 +160,8 @@ The OMNOM wallet lookup bot runs on `@DBOT_DC_BOT` (Hermes agent). Send any wall
 
 - **Announced:** June 8, 2026 by @DogechainFamily
 - **Window:** ~60 days → estimated shutdown ~August 7, 2026
-- **RPC status (Jul 7, 2026):** `rpc.dogechain.dog` alive, `dogechain.rpc.thirdweb.com` alive
-- **BlockScout Explorer:** `explorer.dogechain.dog` — API partially functional
-- **Final snapshot target:** August 3, 2026
+- **Final snapshot:** Week 4 (Jul 5, 2026)
+- **BlockScout Explorer:** `explorer.dogechain.dog` — status unknown post-shutdown
 
 ---
 

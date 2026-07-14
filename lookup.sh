@@ -1,19 +1,11 @@
 #!/bin/bash
 # OMNOM Wallet Lookup — Ever-Held Mode
-# Default: checks master ever-held list (union of ALL weekly snapshots)
+# Checks master list (union of ALL snapshots)
 # Shows max balance ever held + whether they currently still hold
-#
-# Usage: lookup.sh <wallet_address>
-# Output: STATUS, RANK, BALANCE, PERCENTAGE, CLASS, CURRENTLY_HOLDS
-#
-# Data files (managed by weekly_snapshot.py cron):
-#   omnom-snapshot-ever-held.csv  — tab-delimited, union of all snapshots (default)
-#   omnom-snapshot-latest.csv     — comma-delimited, current holders only (for CURRENTLY_HOLDS check)
 
 WALLET="$1"
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-EVER_HELD_CSV="${SCRIPT_DIR}/omnom-snapshot-ever-held.csv"
-LATEST_CSV="${SCRIPT_DIR}/omnom-snapshot-latest.csv"
+EVER_HELD_CSV="/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-ever-held.csv"
+LATEST_CSV="/Users/penny/.openclaw-telegram/workspace/omnom-snapshot/omnom-snapshot-latest.csv"
 DECIMALS=18
 
 if [[ ! "$WALLET" =~ ^0x[a-fA-F0-9]{40}$ ]]; then
@@ -41,7 +33,7 @@ if [ -n "$RESULT" ]; then
     FIRST_SEEN=$(echo "$RESULT" | cut -f8)
 
     # Format balance
-    BAL_FMT=$(python3 -c "print(f'{float(\"$BAL_RAW\") / 10**$DECIMALS:,.2f}')" 2>/dev/null || echo "$BAL_RAW")
+    BAL_FMT=$(python3 -c "print(f'{float(\"$BAL_RAW\") / 10**$DECIMALS:,.2f}')")
 
     # Determine class
     PCT_NUM=$(echo "$PCT" | awk '{printf "%.4f", $1}')
@@ -53,7 +45,7 @@ if [ -n "$RESULT" ]; then
         CLASS="🐟 Fish"
     fi
 
-    # Check if currently holds (in latest snapshot)
+    # Check if currently holds
     STILL_HOLDS="no"
     if [ -f "$LATEST_CSV" ]; then
         LATEST_CHECK=$(awk -F',' -v addr="$WALLET_LOWER" '

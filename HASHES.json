@@ -5,5 +5,8 @@
   "weekly-2026-07-05.csv": "662bd0cf244a75303e2da97edc05b9d6edea938d0963fc14d43ea4460fa6ab6d",
   "omnom-snapshot-FINAL.json": "16d6cb810b62082d9b5e5ed981c7165ab045c19b224c48c3973cfce6efba8e17",
   "omnom-snapshot-pre-announcement.csv": "056433ed5f60fbd3ce0fa6399fb3035422ce1eaa0da3fffc7f019ea477968811",
-  "omnom-snapshot-ever-held.csv": "b230344f5b7d9971e1f3421d63ecdb639a5c1d3a227c76728878b58b9515b7fd"
+  "omnom-snapshot-ever-held.csv": "b230344f5b7d9971e1f3421d63ecdb639a5c1d3a227c76728878b58b9515b7fd",
+  "omnom-snapshot-latest.csv": "5f044098181143087f20e80248c9c4d1d4d8636f253762cab7c300c0d7f1e0e0",
+  "lookup.sh": "eaf164bdcc247b73005de2453d65b5fa4bbd746d8ce11b0d238052e7a8d0bbbc",
+  "README.md": "14ceb5ee8fb1c4f389bf1c7c289da702eed28bf16157d51286f54449eb713ba2"
 }
