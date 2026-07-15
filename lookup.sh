@@ -66,5 +66,39 @@ if [ -n "$RESULT" ]; then
     exit 0
 fi
 
+# Fallback: check latest snapshot directly (user may have been missed by ever-held)
+if [ -f "$LATEST_CSV" ]; then
+    LATEST_RESULT=$(awk -F',' -v addr="$WALLET_LOWER" '
+        NR > 1 && tolower($2) == addr {
+            printf "%s\t%s\t%s\t%s\t%s", $1, $2, $3, $4, $5
+            exit 0
+        }
+    ' "$LATEST_CSV")
+    if [ -n "$LATEST_RESULT" ]; then
+        RANK=$(echo "$LATEST_RESULT" | cut -f1)
+        BAL_FMT=$(echo "$LATEST_RESULT" | cut -f4 | tr -d '\r')
+        BAL_FMT=$(echo "$BAL_FMT" | awk '{printf "%.2f", $1}' | python3 -c "import sys; print('{:,.2f}'.format(float(sys.stdin.read())))")
+        PCT=$(echo "$LATEST_RESULT" | cut -f5 | tr -d '\r')
+        PCT_NUM=$(echo "$PCT" | awk '{printf "%.4f", $1}')
+        if (( $(echo "$PCT_NUM >= 1.0" | bc -l) )); then
+            CLASS="🐋 Whale"
+        elif (( $(echo "$PCT_NUM >= 0.01" | bc -l) )); then
+            CLASS="🐬 Dolphin"
+        else
+            CLASS="🐟 Fish"
+        fi
+        echo "STATUS:CURRENTLY_HOLDS"
+        echo "RANK:$RANK"
+        echo "BEST_RANK:$RANK"
+        echo "BALANCE:$BAL_FMT"
+        echo "PERCENTAGE:$PCT"
+        echo "CLASS:$CLASS"
+        echo "SNAPSHOTS:1 (latest only)"
+        echo "FIRST_SEEN:latest snapshot"
+        echo "CURRENTLY_HOLDS:yes"
+        exit 0
+    fi
+fi
+
 echo "NOT_FOUND"
 exit 0

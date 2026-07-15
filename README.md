@@ -28,8 +28,8 @@ The **union of all snapshots** — anyone who held OMNOM at any point during the
 |-------|-------|
 | File | `omnom-snapshot-ever-held.csv` |
 | Format | Tab-delimited |
-| Holders | 25,591 (unique, all-time) |
-| Source | Pre-announcement + all weekly snapshots merged |
+| Holders | 25,614 (unique, all-time) |
+| Source | Pre-announcement + weekly (Jun 14–Jul 5) + latest snapshot merged |
 | Columns | `rank`, `address`, `max_balance_raw`, `max_pct`, `best_rank`, `snapshot_count`, `snapshots`, `first_seen` |
 
 **What it captures:**
@@ -91,11 +91,12 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 ```
 pre-announcement.csv ──┐
 weekly/w1.csv ──────────┤
-weekly/w2.csv ──────────┼──▶ merge ──▶ omnom-snapshot-ever-held.csv (25,591 holders)
-weekly/w3.csv ──────────┤                      │
-weekly/w4.csv ──────────┘                      ├──▶ omnom-snapshot-latest.csv (current only)
+weekly/w2.csv ──────────┤
+weekly/w3.csv ──────────┼──▶ merge ──▶ omnom-snapshot-ever-held.csv (25,614 holders)
+weekly/w4.csv ──────────┤                      │
+latest.csv ─────────────┘                      ├──▶ omnom-snapshot-latest.csv (current only)
                                                │
-                                               └──▶ lookup.sh (ever-held mode)
+                                               └──▶ lookup.sh (ever-held + latest fallback)
 ```
 
 ---
@@ -104,7 +105,7 @@ weekly/w4.csv ──────────┘                      ├──�
 
 | Script | Purpose |
 |--------|---------|
-| `lookup.sh` | Wallet lookup for Telegram bot — ever-held mode. Returns rank, balance, class, currently holds status |
+| `lookup.sh` | Wallet lookup for Telegram bot — ever-held mode with latest fallback. Returns rank, balance, class, currently holds status |
 | `weekly_snapshot.py` | Live weekly snapshot for cron. Fetches current holders from BlockScout API. Updates `latest.csv` + merges into `ever-held.csv`. Built-in end-date guard |
 | `backfill_snapshot.py` | Reconstructs historical holder snapshots by replaying Transfer events from baseline block. Binary search for exact block at target timestamp |
 
@@ -141,7 +142,7 @@ The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet a
 🐕 $OMNOM Snapshot Lookup
 💰 Balance: 437,380,938,699.93 OMNOM
 📊 Supply: 0.044%
-🏷️ Rank: #94 of 25,591
+🏷️ Rank: #94 of 25,614
 🐬 Dolphin
 📅 Snapshot: June 7, 2026 23:59:58 UTC (Block 59,922,100)
 ```
@@ -152,7 +153,7 @@ The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet a
 
 - `HASHES.json` contains SHA-256 hashes for snapshot files
 - Backfill reconciliation: All weekly snapshots achieve >99.99% balance reconciliation (forward-applied transfers match expected supply). Zero negative balances.
-- Ever-held merge verified: 25,591 unique holders (25,431 pre-announcement + 160 new in weekly snapshots)
+- Ever-held merge verified: 25,614 unique holders (25,431 pre-announcement + 183 new from weekly + latest snapshots)
 
 ---
 
@@ -160,7 +161,7 @@ The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet a
 
 - **Announced:** June 8, 2026 by @DogechainFamily
 - **Window:** ~60 days → estimated shutdown ~August 7, 2026
-- **Final snapshot:** Week 4 (Jul 5, 2026)
+- **Final snapshot:** Week 4 (Jul 5, 2026) + latest (Jul 15, 2026)
 - **BlockScout Explorer:** `explorer.dogechain.dog` — status unknown post-shutdown
 
 ---
