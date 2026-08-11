@@ -83,12 +83,12 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 | Week 2 | Jun 21 | 60,526,824 | 25,388 | -43 | Backfill (transfer events) |
 | Week 3 | Jun 28 | 60,829,218 | 25,442 | +11 | Backfill (transfer events) |
 | Week 4 | Jul 5 | 61,131,617 | 25,474 | +43 | Backfill (transfer events) |
-| Week 5 | Jul 6 | — | 25,477 | +46 | Backfill (transfer events) |
-| Week 6 | Jul 13 | — | 25,496 | +65 | Backfill (transfer events) |
-| Week 7 | Jul 20 | — | 25,521 | +90 | Backfill (transfer events) |
-| Week 8 | Jul 27 | — | 25,549 | +118 | Live cron |
-| Week 9 | Aug 3 | — | 25,546 | +115 | Live cron |
-| Week 10 | Aug 8 | — | 25,542 | +111 | Live cron (final, post-shutdown) |
+| Week 5 | Jul 6 | 61,157,105 | 25,477 | +46 | Backfill (transfer events) |
+| Week 6 | Jul 13 | 61,441,170 | 25,496 | +65 | Backfill (transfer events) |
+| Week 7 | Jul 20 | 61,743,543 | 25,521 | +90 | Backfill (transfer events) |
+| Week 8 | Jul 27 | 62,059,502 | 25,549 | +118 | Live cron |
+| Week 9 | Aug 3 | 62,348,178 | 25,546 | +115 | Live cron |
+| Week 10 | Aug 8 | 62,576,248 | 25,542 | +111 | Live cron (final, post-shutdown) |
 
 **Files in `weekly/`:** JSON + CSV pairs for each week.
 
