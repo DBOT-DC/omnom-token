@@ -2,7 +2,7 @@
 
 Historical holder snapshots for the **OMNOM** ERC-20 token on **Dogechain**.
 
-> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. Snapshots collected weekly until chain shutdown. Data is now archived.
+> **Dogechain shutdown:** Announced June 8, 2026, ~60-day window → estimated shutdown ~August 7, 2026. Snapshots collected weekly until chain shutdown. All 10 weekly snapshots + final Aug 8 capture archived.
 
 ---
 
@@ -28,8 +28,8 @@ The **union of all snapshots** — anyone who held OMNOM at any point during the
 |-------|-------|
 | File | `omnom-snapshot-ever-held.csv` |
 | Format | Tab-delimited |
-| Holders | 25,614 (unique, all-time) |
-| Source | Pre-announcement + weekly (Jun 14–Jul 5) + latest snapshot merged |
+| Holders | 25,686 (unique, all-time) |
+| Source | Pre-announcement + weekly (Jun 14–Aug 8) + latest merged |
 | Columns | `rank`, `address`, `max_balance_raw`, `max_pct`, `best_rank`, `snapshot_count`, `snapshots`, `first_seen` |
 
 **What it captures:**
@@ -47,7 +47,7 @@ The most recent weekly snapshot — holders with non-zero OMNOM balance at the l
 |-------|-------|
 | File | `omnom-snapshot-latest.csv` |
 | Format | CSV (comma-delimited) |
-| Holders | 25,497 |
+| Holders | 25,542 |
 | Columns | `rank`, `address`, `balance_raw`, `balance_formatted`, `percentage_of_supply` |
 
 Used by the lookup script to determine `CURRENTLY_HOLDS: yes/no`.
@@ -83,6 +83,12 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 | Week 2 | Jun 21 | 60,526,824 | 25,388 | -43 | Backfill (transfer events) |
 | Week 3 | Jun 28 | 60,829,218 | 25,442 | +11 | Backfill (transfer events) |
 | Week 4 | Jul 5 | 61,131,617 | 25,474 | +43 | Backfill (transfer events) |
+| Week 5 | Jul 6 | — | 25,477 | +46 | Backfill (transfer events) |
+| Week 6 | Jul 13 | — | 25,496 | +65 | Backfill (transfer events) |
+| Week 7 | Jul 20 | — | 25,521 | +90 | Backfill (transfer events) |
+| Week 8 | Jul 27 | — | 25,549 | +118 | Live cron |
+| Week 9 | Aug 3 | — | 25,546 | +115 | Live cron |
+| Week 10 | Aug 8 | — | 25,542 | +111 | Live cron (final, post-shutdown) |
 
 **Files in `weekly/`:** JSON + CSV pairs for each week.
 
@@ -90,10 +96,10 @@ Tracking holder changes during the Dogechain bridge window (June 8 → August 7,
 
 ```
 pre-announcement.csv ──┐
-weekly/w1.csv ──────────┤
-weekly/w2.csv ──────────┤
-weekly/w3.csv ──────────┼──▶ merge ──▶ omnom-snapshot-ever-held.csv (25,614 holders)
-weekly/w4.csv ──────────┤                      │
+weekly/week1.csv ───────┤
+weekly/week2.csv ───────┤
+weekly/week3.csv ───────┼──▶ merge ──▶ omnom-snapshot-ever-held.csv (25,686 holders)
+weekly/week4-10.csv ────┤                      │
 latest.csv ─────────────┘                      ├──▶ omnom-snapshot-latest.csv (current only)
                                                │
                                                └──▶ lookup.sh (ever-held + latest fallback)
@@ -142,7 +148,7 @@ The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet a
 🐕 $OMNOM Snapshot Lookup
 💰 Balance: 437,380,938,699.93 OMNOM
 📊 Supply: 0.044%
-🏷️ Rank: #94 of 25,614
+🏷️ Rank: #94 of 25,686
 🐬 Dolphin
 📅 Snapshot: June 7, 2026 23:59:58 UTC (Block 59,922,100)
 ```
@@ -153,7 +159,7 @@ The OMNOM wallet lookup bot runs on Hermes agent via Telegram. Send any wallet a
 
 - `HASHES.json` contains SHA-256 hashes for snapshot files
 - Backfill reconciliation: All weekly snapshots achieve >99.99% balance reconciliation (forward-applied transfers match expected supply). Zero negative balances.
-- Ever-held merge verified: 25,614 unique holders (25,431 pre-announcement + 183 new from weekly + latest snapshots)
+- Ever-held merge verified: 25,686 unique holders (25,431 pre-announcement + 255 new from weekly (Jun 14–Aug 8))
 
 ---
 
